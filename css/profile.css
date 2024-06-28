@@ -1,0 +1,111 @@
+/* profile.css */
+
+/* Import Poppins Font  */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: Poppins, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+    text-transform: capitalize;
+}
+
+.container {
+    max-width: 800px;
+    margin: 70px auto 0;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.profile-info {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.profile-info-container {
+    padding: 20px;
+    border-radius: 8px;
+    color: #333;
+    background: #f2f2f2; /* Fallback for older browsers */
+    background: linear-gradient(to bottom right, #ffffff, #e0e0e0);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info-container.pupil {
+    background: #d4edda; /* Fallback for older browsers */
+    background: linear-gradient(to bottom right, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.profile-info-container.specialist {
+    background: #d1ecf1; /* Fallback for older browsers */
+    background: linear-gradient(to bottom right, #d1ecf1, #bee5eb);
+    color: #0c5460;
+}
+
+.profile-info-container.expert {
+    background: #cce5ff; /* Fallback for older browsers */
+    background: linear-gradient(to bottom right, #cce5ff, #3389e7);
+    color: #004085;
+}
+
+.profile-info-container.candidate-master {
+    background: #f8d7da; /* Fallback for older browsers */
+    background: linear-gradient(to bottom right, #f8d7da, #f3c3c7);
+    color: #721c24;
+}
+
+.profile-info-container.grandmaster {
+    background: #ffc107; /* Fallback for older browsers */
+    background: linear-gradient(to bottom right, #ffc107, #ffcc80);
+    color: #856404;
+}
+
+.profile-rating {
+    font-weight: bold;
+}
+
+.profile-info-container h2 {
+    margin-top: 0;
+}
+
+/* Responsive adjustments */
+@media only screen and (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .profile-info {
+        padding: 15px;
+    }
+
+    .profile-info-container {
+        padding: 15px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .profile-info {
+        padding: 10px;
+    }
+
+    .profile-info-container {
+        padding: 10px;
+    }
+}

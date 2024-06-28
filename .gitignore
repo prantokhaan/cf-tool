@@ -1,0 +1,2 @@
+// Ignore the db.php file which is in the database folder
+database/db.php
