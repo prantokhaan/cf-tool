@@ -215,8 +215,12 @@ function filterContests(contests, filterName, searchQuery) {
             (filterName === 'global' && contest.name.toLowerCase().includes('global')) ||
             (filterName === 'others' && !contest.name.toLowerCase().includes('div. 1') && !contest.name.toLowerCase().includes('div. 2') && !contest.name.toLowerCase().includes('div. 3') && !contest.name.toLowerCase().includes('div. 4') && !contest.name.toLowerCase().includes('educational') && !contest.name.toLowerCase().includes('global'))
         );
-
-        return matchName || matchId && isFiltered;
+        
+        if(searchQuery == ''){
+            return isFiltered;
+        }else{
+            return (matchName || matchId) && isFiltered;
+        }
     });
 }
 
