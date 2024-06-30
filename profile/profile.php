@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/nav.css">
     <link rel="stylesheet" href="../css/profile.css">
     <link rel="favicon" href="../images/favicon.png">
+    <link rel="stylesheet" href="./visualize/tags.css">
     <script>
         // Function to fetch user info from Codeforces API
         async function fetchUserInfo(handle) {
@@ -100,6 +101,12 @@
                 <!-- Profile information will be populated here -->
             </div>
         </div>
+    </div>
+    <div style="margin-top: 10px">
+        <?php include './visualize/visualize.php'; ?>
+    </div>
+    <div style="margin-top: 10px;">
+        <?php include './visualize/tags_visualize.php'; ?>
     </div>
 </body>
 </html>
