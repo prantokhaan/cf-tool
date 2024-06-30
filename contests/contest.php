@@ -6,6 +6,7 @@
     <title>Codeforces Contests</title>
     <link rel="stylesheet" href="../css/nav.css">
     <link rel="stylesheet" href="../css/contest.css">
+    <link rel="favicon" href="../images/favicon.png">
     
 </head>
 <body>

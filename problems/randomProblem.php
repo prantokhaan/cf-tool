@@ -65,13 +65,21 @@
         async function getSolvedProblems(handle) {
             const userSubmissions = await fetchUserSubmissions(handle);
             const solvedProblems = new Set();
-            if (userSubmissions.status === 'OK') {
-                userSubmissions.result.forEach(submission => {
-                    if (submission.verdict === 'OK') {
+            if(userSubmissions){
+                userSubmissions.forEach(submission => {
+                    if(submission.verdict === 'OK'){
                         solvedProblems.add(`${submission.problem.contestId}${submission.problem.index}`);
                     }
-                });
+                })
             }
+            // if (userSubmissions.status === 'OK') {
+            //     userSubmissions.result.forEach(submission => {
+            //         console.log("Submissions: " + submission);
+            //         if (submission.verdict === 'OK') {
+            //             solvedProblems.add(`${submission.problem.contestId}${submission.problem.index}`);
+            //         }
+            //     });
+            // }
             return solvedProblems;
         }
 

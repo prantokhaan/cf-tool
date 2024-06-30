@@ -69,13 +69,13 @@
 
         // Function to fetch user submissions from Codeforces API based on handle with caching
         async function fetchUserSubmissions(handle) {
-            const cacheKey = `user_submissions_problems_${handle}`;
+            const cacheKey = `user_submissions_${handle}`;
             const cacheTime = 5 * 60 * 1000; // Cache for 5 minutes (in milliseconds)
             const cachedData = localStorage.getItem(cacheKey);
             const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
 
             if (cachedData && cacheTimestamp && (Date.now() - cacheTimestamp < cacheTime)) {
-                return JSON.parse(cachedData);
+                return JSON.parse(cachedData); // Ensure cached data is returned in the same format
             } else {
                 try {
                     const apiUrl = `https://codeforces.com/api/user.status?handle=${encodeURIComponent(handle)}`;
@@ -86,11 +86,12 @@
                     }
 
                     const data = await response.json();
+                    const result = data.result; // Store only the result
 
-                    localStorage.setItem(cacheKey, JSON.stringify(data));
+                    localStorage.setItem(cacheKey, JSON.stringify(result)); // Store only the result in localStorage
                     localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
 
-                    return data;
+                    return result; // Return only the result
                 } catch (error) {
                     console.error('Error fetching user submissions:', error);
                     return null;
@@ -194,12 +195,9 @@
 
         // Function to get user submission status for a problem
         function getUserSubmissionStatus(userSubmissions, problem) {
-            if (userSubmissions && userSubmissions.status === 'OK') {
-                const submissions = userSubmissions.result;
-                for (const submission of submissions) {
-                    if (submission.problem.contestId === problem.contestId && submission.problem.index === problem.index) {
-                        return submission.verdict === 'OK' ? 'solved' : 'attempted';
-                    }
+            for (const submission of userSubmissions) {
+                if (submission.problem.contestId === problem.contestId && submission.problem.index === problem.index) {
+                    return submission.verdict === 'OK' ? 'solved' : 'attempted';
                 }
             }
             return null;
@@ -240,26 +238,21 @@
             }
         }
 
-        // Function to load a specific page
+        // Function to load a specific page of problems
         async function loadPage(page) {
-            const ratingFilter = localStorage.getItem('ratingFilter') || '';
-            const minContestIdFilter = localStorage.getItem('minContestIdFilter') || '';
-            const maxContestIdFilter = localStorage.getItem('maxContestIdFilter') || '';
-            const searchQuery = localStorage.getItem('searchQuery') || '';
-            const tagsFilter = localStorage.getItem('tagsFilter') || '';
+            const ratingFilter = localStorage.getItem('ratingFilter');
+            const minContestIdFilter = localStorage.getItem('minContestIdFilter');
+            const maxContestIdFilter = localStorage.getItem('maxContestIdFilter');
+            const searchQuery = localStorage.getItem('searchQuery');
+            const tagsFilter = localStorage.getItem('tagsFilter');
             const cfUser = localStorage.getItem('cfUser');
-
-            const problemsData = await fetchProblemsFromApi();
-            const problems = problemsData.status === 'OK' ? problemsData.result.problems : [];
-            allProblems = problems; // Save the full problem list for live filtering
-            const filteredProblems = filterProblems(problems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, tagsFilter);
-
             const userSubmissions = cfUser ? await fetchUserSubmissions(cfUser) : null;
 
+            const filteredProblems = filterProblems(allProblems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, tagsFilter);
             displayProblems(filteredProblems, userSubmissions, page, 100);
         }
 
-        // Function to show a random problem
+                // Function to show a random problem
         function showRandomProblem() {
             const ratingFilter = localStorage.getItem('ratingFilter') || '';
             const minContestIdFilter = localStorage.getItem('minContestIdFilter') || '';
@@ -278,7 +271,7 @@
             window.location.href = url;
         }
 
-        // Function to initialize the page
+                // Function to initialize the page
         function initPage() {
             // Restore filters from localStorage
             document.getElementById('rating').value = localStorage.getItem('ratingFilter') || '';
@@ -313,7 +306,9 @@
                 loadPage(1);
             });
 
-            document.querySelector('.random-problem-btn').addEventListener('click', showRandomProblem);
+            document.querySelector('.random-problem-btn').addEventListener('click',()=>{
+                window.location.href = 'randomProblem.php';
+            });
 
             document.getElementById('search').addEventListener('click', () => {
                 localStorage.setItem('searchQuery', document.getElementById('searchQuery').value);
@@ -348,28 +343,15 @@
         // Initialize the page when DOM is fully loaded
         document.addEventListener('DOMContentLoaded', initPage);
 
-        document.querySelectorAll('th[data-sort]').forEach(header => {
-    header.addEventListener('click', async function() {
-        console.log('clicked');
-        const key = this.getAttribute('data-sort');
-        toggleSortOrder(key);
-        const ratingFilter = localStorage.getItem('ratingFilter') || '';
-        const minContestIdFilter = localStorage.getItem('minContestIdFilter') || '';
-        const maxContestIdFilter = localStorage.getItem('maxContestIdFilter') || '';
-        const searchQuery = localStorage.getItem('searchQuery') || '';
-        const cfUser = localStorage.getItem('cfUser');
+        document.querySelectorAll('th').forEach(th => {
+            th.addEventListener('click', () => {
+                toggleSortOrder(th.dataset.sort);
+                loadPage(1); // Load the first page after sorting
+            });
+        });
 
-        const problemsData = await fetchProblemsFromApi();
-        const problems = problemsData.status === 'OK' ? problemsData.result.problems : [];
-        allProblems = problems; // Save the full problem list for live filtering
-        const filteredProblems = filterProblems(problems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery);
-
-        const userSubmissions = cfUser ? await fetchUserSubmissions(cfUser) : null;
-
-        displayProblems(filteredProblems, userSubmissions, 1, 100);
-    });
-});
-
+        // Load the first page on initial load
+        document.addEventListener('DOMContentLoaded', () => loadPage(1));
     </script>
 </head>
 <body>

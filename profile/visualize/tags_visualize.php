@@ -66,7 +66,7 @@
                 const legendContainer = document.getElementById('chart-legend');
                 legendContainer.innerHTML = tags.map((tag, index) => {
                     return `<div class="legend-item">
-                                <span class="legend-color" style="background-color: ${colors[index]};"></span>${tag}
+                                <span class="legend-color" style="background-color: ${colors[index]};"></span>${tag}: ${counts[index]}
                             </div>`;
                 }).join('');
             };

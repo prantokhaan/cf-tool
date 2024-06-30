@@ -5,6 +5,7 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $newHandle = $_POST['newHandle'];
+    $oldHandle = $_POST['oldHandle'];
     $password = $_POST['password'];
     $error = '';
     $success = '';
@@ -41,8 +42,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 $stmt->bind_param('si', $newHandle, $user['id']);
                 if ($stmt->execute()) {
+                    $submissions = 'user_submissions_problems_' . $oldHandle;
+                    $submissionsTimeStamp = 'user_submissions_problems_' . $oldHandle . '_timestamp';
+                    $solvedProblems = 'cfSolvedProblems_' . $oldHandle;
+                    $solvedTags = 'cfSolvedTags_' . $oldHandle;
+                    $userSubmissions = 'user_submissions_' . $oldHandle;
+                    $userSubmissionsTimeStamp = 'user_submissions_' . $oldHandle . '_timestamp';
                     echo "<script>
                         localStorage.setItem('cfUser', '$newHandle');
+                        localStorage.removeItem('$submissions');
+                        localStorage.removeItem('$submissionsTimeStamp');
+                        localStorage.removeItem('$solvedProblems');
+                        localStorage.removeItem('$solvedTags');
+                        localStorage.removeItem('$userSubmissions');
+                        localStorage.removeItem('$userSubmissionsTimeStamp');
+
                     </script>";
                     $success = 'Handle changed successfully';
                 } else {
@@ -75,6 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <form action="change_handle.php" method="post">
         <div id="handle"></div>
         <div>
+            <input type="hidden" id="oldHandle" name="oldHandle" value="">
+        </div>
+        <div>
             <input type="hidden" id="username" name="username" value="">
         </div>
         <div>
@@ -92,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         var username = localStorage.getItem('username');
         document.getElementById('username').value = username;
         var handle = localStorage.getItem('cfUser');
+        document.getElementById('oldHandle').value = handle;
         document.getElementById('handle').innerHTML = 'Current Handle: ' + handle;
     </script>
 </body>
