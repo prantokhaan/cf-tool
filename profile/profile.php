@@ -108,5 +108,8 @@
     <div style="margin-top: 10px;">
         <?php include './visualize/tags_visualize.php'; ?>
     </div>
+    <div style="margin-top: 10px;">
+        <?php include './visualize/index_visualize.php'; ?>
+    </div>
 </body>
 </html>
