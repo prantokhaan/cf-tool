@@ -114,6 +114,8 @@
                         <p>Contest ID: ${problem.contestId}</p>
                         <p>Rating: ${problem.rating ? problem.rating : 'N/A'}</p>
                         <a href="https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}" target="_blank">View on Codeforces</a>
+                        <a href="start_solving.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Start Solving</a>
+        <a href="#">Add to Solved</a>
                     </div>
                     <button class="random-problem-btn" onclick="showRandomProblem()">Generate Another Problem</button>
                 `;

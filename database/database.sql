@@ -22,3 +22,19 @@ CREATE TABLE pending_users (
 );
 
 select * from users;
+
+create table solvedProblems(
+    id int primary key auto_increment,
+    username varchar(255) not null,
+    contestId int not null,
+    problemIndex varchar(255) not null,
+    problemName varchar(255) not null,
+    problemRating int not null,
+    submissionId int not null,
+    timeToSolve int not null,
+    language varchar(255) not null,
+    problemTags varchar(255) not null,
+    howSolved varchar(255) not null
+);
+
+select * from solvedProblems;

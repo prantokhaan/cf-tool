@@ -181,11 +181,17 @@
                 }
 
                 tr.innerHTML = `
-                    <td>${problem.contestId}${problem.index}</td>
-                    <td><a href="https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}" target="_blank">${problem.name}</a></td>
-                    <td>${problem.contestId}</td>
-                    <td>${problem.rating ? problem.rating : 'N/A'}</td>
-                `;
+    <td>${problem.contestId}${problem.index}</td>
+    <td><a href="https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}" target="_blank">${problem.name}</a></td>
+    <td>${problem.contestId}</td>
+    <td>${problem.rating ? problem.rating : 'N/A'}</td>
+    <td>
+        <a href="start_solving.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Start Solving</a>
+        <span>||</span>
+        <a href="#">Add to Solved</a>
+    </td>
+`;
+
 
                 tableBody.appendChild(tr);
             });
@@ -399,6 +405,7 @@
                     <th data-sort="name">Problem Name</th>
                     <th data-sort="contestId">Contest ID</th>
                     <th data-sort="rating">Rating</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>

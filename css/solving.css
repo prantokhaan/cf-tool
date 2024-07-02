@@ -1,0 +1,106 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    margin: 100px auto; /* Center the container and provide top space */
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.problem-details {
+    margin-bottom: 20px;
+}
+
+.problem-details p {
+    font-size: 1rem;
+    margin: 5px 0;
+    color: #555;
+}
+
+.timer {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.buttons {
+    margin-top: 20px;
+}
+
+.buttons button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#startButton {
+    background-color: #28a745;
+    color: white;
+}
+
+#startButton:hover {
+    background-color: #218838;
+}
+
+#pauseButton {
+    background-color: #ffc107;
+    color: white;
+}
+
+#pauseButton:hover {
+    background-color: #e0a800;
+}
+
+#stopButton {
+    background-color: #dc3545;
+    color: white;
+}
+
+#stopButton:hover {
+    background-color: #c82333;
+}
+
+.solved-options{
+    margin-top: 20px;
+}
+
+/* Styling for select options */
+.solved-options select {
+    padding: 10px;
+    font-size: 1rem;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Styling for add button */
+.solved-options button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.solved-options button:hover {
+    background-color: #0056b3;
+}
