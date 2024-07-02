@@ -111,5 +111,8 @@
     <div style="margin-top: 10px;">
         <?php include './visualize/index_visualize.php'; ?>
     </div>
+    <div style="margin-top: 10px;">
+        <?php include './visualize/rating_graph.php'; ?>
+    </div>
 </body>
 </html>
