@@ -38,3 +38,5 @@ create table solvedProblems(
 );
 
 select * from solvedProblems;
+
+delete from solvedProblems where id=3;
