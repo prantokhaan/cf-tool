@@ -20,7 +20,7 @@ if ($row_check['count'] > 0) {
     echo "
         <script>
             alert('Record already exists');
-            window.location.href = './allProblems.php';
+            window.location.href='./allProblems.php';
         </script>
     ";
 } else {

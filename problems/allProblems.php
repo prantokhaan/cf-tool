@@ -6,17 +6,20 @@
     <title>Codeforces Problems</title>
     <link rel="stylesheet" href="../css/nav.css">
     <link rel="stylesheet" href="../css/allProblems.css">
+    <link rel="stylesheet" href="../shared/loader.css">
+    <link rel="favicon" href="../images/favicon.png">
     <script>
         let allProblems = [];
 
-        // Function to fetch problems from Codeforces API with caching
         async function fetchProblemsFromApi() {
+            document.body.classList.add('loading');
             const cacheKey = 'codeforces_problems_cache';
             const cacheTime = 3600 * 1000; // Cache for 1 hour (in milliseconds)
             const cachedData = localStorage.getItem(cacheKey);
             const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
 
             if (cachedData && cacheTimestamp && (Date.now() - cacheTimestamp < cacheTime)) {
+                document.body.classList.remove('loading');
                 return JSON.parse(cachedData);
             } else {
                 try {
@@ -31,10 +34,11 @@
 
                     localStorage.setItem(cacheKey, JSON.stringify(data));
                     localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
-
+                    document.body.classList.remove('loading');
                     return data;
                 } catch (error) {
                     console.error('Error fetching problems:', error);
+                    document.body.classList.remove('loading');
                     return null;
                 }
             }
@@ -47,6 +51,9 @@
 
             const tags = await extractTags(problems);
             populateTagsDropdown(tags);
+
+            initPage();
+            loadPage(1); // Load the first page after initializing
         });
 
         async function extractTags(problems){
@@ -67,7 +74,6 @@
             });
         }
 
-        // Function to fetch user submissions from Codeforces API based on handle with caching
         async function fetchUserSubmissions(handle) {
             const cacheKey = `user_submissions_${handle}`;
             const cacheTime = 5 * 60 * 1000; // Cache for 5 minutes (in milliseconds)
@@ -99,7 +105,6 @@
             }
         }
 
-        // Function to filter problems based on rating, contest ID, name, or problem ID
         function filterProblems(problems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, filterTags) {
             return problems.filter(problem => {
                 const matchRating = (!ratingFilter || problem.rating == ratingFilter);
@@ -112,7 +117,6 @@
             });
         }
 
-        // Function to filter problems live as the user types
         async function filterProblemsLive() {
             const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
             const ratingFilter = document.getElementById('rating').value;
@@ -133,7 +137,6 @@
             displayProblems(filteredProblems, userSubmissions, 1, 100);
         }
 
-        // Function to display problems on the page
         let sortOrder = { key: '', order: '' }; // Object to keep track of the sort order for each column
 
         function sortData(data, key, order) {
@@ -169,195 +172,87 @@
                 problems = sortData(problems, sortOrder.key, sortOrder.order);
             }
 
+            console.log(problems);
+
             const start = (page - 1) * perPage;
-            const problemsOnPage = problems.slice(start, start + perPage);
+            const end = start + perPage;
+            const paginatedProblems = problems.slice(start, end);
 
-            problemsOnPage.forEach(problem => {
-                const userSubmissionStatus = userSubmissions ? getUserSubmissionStatus(userSubmissions, problem) : null;
-                const tr = document.createElement('tr');
-
-                if (userSubmissionStatus) {
-                    tr.classList.add(userSubmissionStatus);
-                }
-
-                tr.innerHTML = `
-    <td>${problem.contestId}${problem.index}</td>
-    <td><a href="https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}" target="_blank">${problem.name}</a></td>
-    <td>${problem.contestId}</td>
-    <td>${problem.rating ? problem.rating : 'N/A'}</td>
-    <td>
+            paginatedProblems.forEach(problem => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${problem.contestId}${problem.index}</td>
+                    <td>${problem.name}</td>
+                    <td>${problem.contestId}</td>
+                    <td>${problem.rating || 'N/A'}</td>
+                    <td>
         <a href="start_solving.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Start Solving</a>
         <span>||</span>
         <a href="add_to_solved.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Add to Solved</a>
     </td>
-`;
+                `;
 
+                const problemId = `${problem.contestId}${problem.index}`;
 
-                tableBody.appendChild(tr);
+                if (userSubmissions && userSubmissions.some(sub => sub.problem.contestId == problem.contestId && sub.problem.index == problem.index)) {
+                    row.style.backgroundColor = 'lightgreen'; // Highlight solved problems
+                }
+
+                tableBody.appendChild(row);
             });
 
-            displayPagination(problems.length, page, perPage);
+            renderPagination(problems.length, page, perPage);
         }
 
-        // Function to get user submission status for a problem
-        function getUserSubmissionStatus(userSubmissions, problem) {
-            for (const submission of userSubmissions) {
-                if (submission.problem.contestId === problem.contestId && submission.problem.index === problem.index) {
-                    return submission.verdict === 'OK' ? 'solved' : 'attempted';
-                }
-            }
-            return null;
-        }
-
-        // Function to display pagination
-        function displayPagination(totalProblems, currentPage, perPage) {
-            const pagination = document.querySelector('.pagination');
+        function renderPagination(totalProblems, currentPage, perPage) {
+            const totalPages = Math.ceil(totalProblems / perPage);
+            const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
 
-            const totalPages = Math.ceil(totalProblems / perPage);
-
-            if (currentPage > 1) {
-                const prevLink = document.createElement('a');
-                prevLink.href = '#';
-                prevLink.textContent = 'Previous';
-                prevLink.addEventListener('click', () => loadPage(currentPage - 1));
-                pagination.appendChild(prevLink);
-            }
-
             for (let i = 1; i <= totalPages; i++) {
-                const pageLink = document.createElement('a');
-                pageLink.href = '#';
-                pageLink.textContent = i;
-                if (i === currentPage) {
-                    pageLink.classList.add('active');
-                }
-                pageLink.addEventListener('click', () => loadPage(i));
-                pagination.appendChild(pageLink);
-            }
-
-            if (currentPage < totalPages) {
-                const nextLink = document.createElement('a');
-                nextLink.href = '#';
-                nextLink.textContent = 'Next';
-                nextLink.addEventListener('click', () => loadPage(currentPage + 1));
-                pagination.appendChild(nextLink);
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.classList.toggle('active', i === currentPage);
+                button.addEventListener('click', () => loadPage(i));
+                pagination.appendChild(button);
             }
         }
 
-        // Function to load a specific page of problems
-        async function loadPage(page) {
-            const ratingFilter = localStorage.getItem('ratingFilter');
-            const minContestIdFilter = localStorage.getItem('minContestIdFilter');
-            const maxContestIdFilter = localStorage.getItem('maxContestIdFilter');
-            const searchQuery = localStorage.getItem('searchQuery');
-            const tagsFilter = localStorage.getItem('tagsFilter');
-            const cfUser = localStorage.getItem('cfUser');
-            const userSubmissions = cfUser ? await fetchUserSubmissions(cfUser) : null;
-
-            const filteredProblems = filterProblems(allProblems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, tagsFilter);
-            displayProblems(filteredProblems, userSubmissions, page, 100);
-        }
-
-                // Function to show a random problem
-        function showRandomProblem() {
+        async function initPage() {
+            const searchQuery = localStorage.getItem('searchQuery') || '';
             const ratingFilter = localStorage.getItem('ratingFilter') || '';
             const minContestIdFilter = localStorage.getItem('minContestIdFilter') || '';
             const maxContestIdFilter = localStorage.getItem('maxContestIdFilter') || '';
             const tagsFilter = localStorage.getItem('tagsFilter') || '';
 
-            let url = 'randomProblem.php';
-            if (ratingFilter || minContestIdFilter || maxContestIdFilter || tagsFilter) {
-                url += '?';
-                if (ratingFilter) url += `rating=${ratingFilter}`;
-                if (minContestIdFilter) url += `&minContestId=${minContestIdFilter}`;
-                if (maxContestIdFilter) url += `&maxContestId=${maxContestIdFilter}`;
-                if(tagsFilter) url += `&tags=${tagsFilter}`;
-            }
-
-            window.location.href = url;
-        }
-
-                // Function to initialize the page
-        function initPage() {
-            // Restore filters from localStorage
-            document.getElementById('rating').value = localStorage.getItem('ratingFilter') || '';
-            document.getElementById('minContestId').value = localStorage.getItem('minContestIdFilter') || '';
-            document.getElementById('maxContestId').value = localStorage.getItem('maxContestIdFilter') || '';
-            document.getElementById('searchQuery').value = localStorage.getItem('searchQuery') || '';
-            document.getElementById('filterByTags').value = localStorage.getItem('tagsFilter') || '';
-
-            // Add event listeners
-            document.getElementById('filterRating').addEventListener('click', () => {
-                localStorage.setItem('ratingFilter', document.getElementById('rating').value);
-                loadPage(1);
-            });
-
-            document.getElementById('resetRating').addEventListener('click', () => {
-                localStorage.removeItem('ratingFilter');
-                document.getElementById('rating').value = '';
-                loadPage(1);
-            });
-
-            document.getElementById('filterContestId').addEventListener('click', () => {
-                localStorage.setItem('minContestIdFilter', document.getElementById('minContestId').value);
-                localStorage.setItem('maxContestIdFilter', document.getElementById('maxContestId').value);
-                loadPage(1);
-            });
-
-            document.getElementById('resetContestId').addEventListener('click', () => {
-                localStorage.removeItem('minContestIdFilter');
-                localStorage.removeItem('maxContestIdFilter');
-                document.getElementById('minContestId').value = '';
-                document.getElementById('maxContestId').value = '';
-                loadPage(1);
-            });
-
-            document.querySelector('.random-problem-btn').addEventListener('click',()=>{
-                window.location.href = 'randomProblem.php';
-            });
-
-            document.getElementById('search').addEventListener('click', () => {
-                localStorage.setItem('searchQuery', document.getElementById('searchQuery').value);
-                loadPage(1);
-            });
-
-            document.getElementById('resetSearch').addEventListener('click', () => {
-                localStorage.removeItem('searchQuery');
-                document.getElementById('searchQuery').value = '';
-                loadPage(1);
-            });
+            document.getElementById('searchQuery').value = searchQuery;
+            document.getElementById('rating').value = ratingFilter;
+            document.getElementById('minContestId').value = minContestIdFilter;
+            document.getElementById('maxContestId').value = maxContestIdFilter;
+            document.getElementById('filterByTags').value = tagsFilter;
 
             document.getElementById('searchQuery').addEventListener('input', filterProblemsLive);
-
-            document.getElementById('rating').addEventListener('input', filterProblemsLive);
-
-            document.getElementById('filterByTags').addEventListener('input', () => {
-                localStorage.setItem('tagsFilter', document.getElementById('filterByTags').value);
-                loadPage(1);
-            });
-
-            document.getElementById('resetFilterTags').addEventListener('click', () => {
-                localStorage.removeItem('tagsFilter');
-                document.getElementById('filterByTags').value = '';
-                loadPage(1);
-            });
-
-            // Load the first page initially
-            loadPage(1);
+            document.getElementById('rating').addEventListener('change', filterProblemsLive);
+            document.getElementById('minContestId').addEventListener('input', filterProblemsLive);
+            document.getElementById('maxContestId').addEventListener('input', filterProblemsLive);
+            document.getElementById('filterByTags').addEventListener('change', filterProblemsLive);
         }
 
-        // Initialize the page when DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', initPage);
+        function loadPage(page) {
+            document.body.classList.add('loading');
+            const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+            const ratingFilter = document.getElementById('rating').value;
+            const minContestIdFilter = document.getElementById('minContestId').value;
+            const maxContestIdFilter = document.getElementById('maxContestId').value;
+            const tagsFilter = document.getElementById('filterByTags').value;
 
-        document.querySelectorAll('th').forEach(th => {
-            th.addEventListener('click', () => {
-                toggleSortOrder(th.dataset.sort);
-                loadPage(1); // Load the first page after sorting
+            const cfUser = localStorage.getItem('cfUser');
+            fetchUserSubmissions(cfUser).then(userSubmissions => {
+                const filteredProblems = filterProblems(allProblems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, tagsFilter);
+                displayProblems(filteredProblems, userSubmissions, page, 100);
+                document.body.classList.remove('loading');
             });
-        });
-
-        // Load the first page on initial load
-        document.addEventListener('DOMContentLoaded', () => loadPage(1));
+        }
     </script>
 </head>
 <body>
