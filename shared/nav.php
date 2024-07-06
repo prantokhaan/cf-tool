@@ -1,8 +1,26 @@
 <div>
   <div class="navbar" id="navbar">
     <a href="../index.php">Home</a>
-    <a href="../contests/contest.php">Contests</a>
-    <a href="../problems/allProblems.php">Problems</a>
+    <div class="dropdown">
+      <button class="dropbtn">
+        <span style="font-weight:800">Contests</span>
+        <i class="fa fa-caret-down"></i>
+      </button>
+      <div class="dropdown-content">
+        <a href="../contests/contest.php">Codeforces</a>
+        <a href="../problems/atcoderProblems.php">Atcoder</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">
+        <span style="font-weight:800">Problems</span>
+        <i class="fa fa-caret-down"></i>
+      </button>
+      <div class="dropdown-content">
+        <a href="../problems/allProblems.php">Codeforces</a>
+        <a href="../problems/atcoderProblems.php">Atcoder</a>
+      </div>
+    </div>
     <a href="../auth/login.php" id="login">Login</a>
     <a href="../auth/register.php" id="register">Register</a>
     <div class="dropdown">
@@ -11,6 +29,7 @@
         <a href="../profile/profile.php">My Profile</a>
         <a href="../profile/change_password.php">Change Password</a>
         <a href="../profile/change_handle.php">Change CF Handle</a>
+        <a href="../profile/mySolvedProblems.php">My Solved Problems</a>
       </div>
     </div>
     <a href="#" id="logout">Logout</a>

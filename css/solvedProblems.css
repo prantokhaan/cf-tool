@@ -1,0 +1,131 @@
+/* styles.css */
+/* Import Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.container {
+    font-family: 'Poppins', sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-top: 60px;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+label, select, button {
+    display: block;
+    margin: 10px auto;
+    font-size: 1rem;
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    border-radius: 5px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.calculation h3 {
+    margin: 5px 0;
+    color: #555;
+}
+
+.calc{
+    font-weight: 600;
+}
+
+.calcInside{
+    font-weight: 400;
+    color: green;
+}
+
+#statusPieChartContainer {
+            width: 400px; /* Set the desired width */
+            margin: 0 auto; /* Center the chart */
+        }
+        #statusPieChart {
+            width: 100%; /* Make the canvas take the full width of the container */
+            height: auto; /* Adjust the height proportionally */
+        }
+
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+    
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    tr {
+        border: 1px solid #ccc;
+    }
+    
+    td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+    
+    td:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: calc(50% - 12px);
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        content: attr(data-label);
+    }
+    
+    td:last-child {
+        border-bottom: 0;
+    }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
