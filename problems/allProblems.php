@@ -165,58 +165,75 @@
         }
 
         async function displayProblems(problems, userSubmissions, page, perPage) {
-            const tableBody = document.querySelector('tbody');
-            tableBody.innerHTML = '';
+    const tableBody = document.querySelector('tbody');
+    tableBody.innerHTML = '';
 
-            if (sortOrder.key) {
-                problems = sortData(problems, sortOrder.key, sortOrder.order);
-            }
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    const paginatedProblems = problems.slice(start, end);
 
-            console.log(problems);
+    paginatedProblems.forEach(problem => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${problem.contestId}${problem.index}</td>
+            <td>${problem.name}</td>
+            <td>${problem.contestId}</td>
+            <td>${problem.rating || 'N/A'}</td>
+            <td>
+                <a href="start_solving.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Start Solving</a>
+                <span>||</span>
+                <a href="add_to_solved.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Add to Solved</a>
+            </td>
+        `;
 
-            const start = (page - 1) * perPage;
-            const end = start + perPage;
-            const paginatedProblems = problems.slice(start, end);
+        const problemId = `${problem.contestId}${problem.index}`;
 
-            paginatedProblems.forEach(problem => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${problem.contestId}${problem.index}</td>
-                    <td>${problem.name}</td>
-                    <td>${problem.contestId}</td>
-                    <td>${problem.rating || 'N/A'}</td>
-                    <td>
-        <a href="start_solving.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Start Solving</a>
-        <span>||</span>
-        <a href="add_to_solved.php?contestId=${problem.contestId}&index=${problem.index}&name=${encodeURIComponent(problem.name)}&rating=${problem.rating ? problem.rating : 'N/A'}">Add to Solved</a>
-    </td>
-                `;
-
-                const problemId = `${problem.contestId}${problem.index}`;
-
-                if (userSubmissions && userSubmissions.some(sub => sub.problem.contestId == problem.contestId && sub.problem.index == problem.index)) {
-                    row.style.backgroundColor = 'lightgreen'; // Highlight solved problems
-                }
-
-                tableBody.appendChild(row);
-            });
-
-            renderPagination(problems.length, page, perPage);
+        if (userSubmissions && userSubmissions.some(sub => sub.problem.contestId == problem.contestId && sub.problem.index == problem.index)) {
+            row.style.backgroundColor = 'lightgreen'; // Highlight solved problems
         }
 
-        function renderPagination(totalProblems, currentPage, perPage) {
-            const totalPages = Math.ceil(totalProblems / perPage);
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
+        tableBody.appendChild(row);
+    });
 
-            for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement('button');
-                button.textContent = i;
-                button.classList.toggle('active', i === currentPage);
-                button.addEventListener('click', () => loadPage(i));
-                pagination.appendChild(button);
-            }
-        }
+    renderPagination(problems.length, page, perPage);
+}
+
+
+function renderPagination(totalProblems, currentPage, perPage) {
+    const pagination = document.getElementById('pagination');
+    if (!pagination) {
+        console.error('Pagination element not found.');
+        return;
+    }
+
+    pagination.innerHTML = ''; // Clear previous pagination buttons
+
+    const totalPages = Math.ceil(totalProblems / perPage);
+    
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.classList.toggle('active', i === currentPage);
+        button.addEventListener('click', () => loadPage(i));
+        pagination.appendChild(button);
+    }
+
+    if(currentPage>1){
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Prev';
+        prevButton.addEventListener('click', () => loadPage(currentPage-1));
+        pagination.insertBefore(prevButton, pagination.firstChild);
+    }
+
+    if(currentPage<totalPages){
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.addEventListener('click', () => loadPage(currentPage+1));
+        pagination.appendChild(nextButton);
+    }
+}
+
+
 
         async function initPage() {
             const searchQuery = localStorage.getItem('searchQuery') || '';
@@ -239,20 +256,21 @@
         }
 
         function loadPage(page) {
-            document.body.classList.add('loading');
-            const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
-            const ratingFilter = document.getElementById('rating').value;
-            const minContestIdFilter = document.getElementById('minContestId').value;
-            const maxContestIdFilter = document.getElementById('maxContestId').value;
-            const tagsFilter = document.getElementById('filterByTags').value;
+    document.body.classList.add('loading');
+    const searchQuery = document.getElementById('searchQuery').value.toLowerCase();
+    const ratingFilter = document.getElementById('rating').value;
+    const minContestIdFilter = document.getElementById('minContestId').value;
+    const maxContestIdFilter = document.getElementById('maxContestId').value;
+    const tagsFilter = document.getElementById('filterByTags').value;
 
-            const cfUser = localStorage.getItem('cfUser');
-            fetchUserSubmissions(cfUser).then(userSubmissions => {
-                const filteredProblems = filterProblems(allProblems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, tagsFilter);
-                displayProblems(filteredProblems, userSubmissions, page, 100);
-                document.body.classList.remove('loading');
-            });
-        }
+    const cfUser = localStorage.getItem('cfUser');
+    fetchUserSubmissions(cfUser).then(userSubmissions => {
+        const filteredProblems = filterProblems(allProblems, ratingFilter, minContestIdFilter, maxContestIdFilter, searchQuery, tagsFilter);
+        displayProblems(filteredProblems, userSubmissions, page, 100);
+        document.body.classList.remove('loading');
+    });
+}
+
     </script>
 </head>
 <body>
@@ -308,7 +326,7 @@
             </tbody>
         </table>
 
-        <div class="pagination">
+        <div class="pagination" id="pagination">
             <!-- Pagination links will be dynamically inserted here -->
         </div>
     </div>

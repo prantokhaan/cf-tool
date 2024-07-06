@@ -106,27 +106,24 @@ th {
 }
 
 .pagination {
-    display: flex;
-    justify-content: center;
     margin-top: 20px;
-    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    text-align: center;
 }
 
-.pagination a {
-    padding: 10px 15px;
-    text-decoration: none;
-    border: 1px solid #ddd;
-    color: #007bff;
-    margin: 0 5px;
-    border-radius: 4px;
-    white-space: nowrap; /* Prevent buttons from wrapping prematurely */
+.pagination button {
+    margin: 5px 5px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
 }
 
-.pagination a.active {
+.pagination button.active {
     background-color: #007bff;
-    color: white;
-    border: 1px solid #007bff;
+    color: #fff;
+    border-color: #007bff;
 }
+
 
 .pagination a:hover:not(.active) {
     background-color: #ddd;
