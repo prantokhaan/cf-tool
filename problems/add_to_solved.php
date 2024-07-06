@@ -80,7 +80,8 @@ $rating = $_GET['rating'];
 
             document.getElementById('solveForm').addEventListener('submit', function(e){
                 e.preventDefault();
-                const timeToSolve = document.getElementById('timeToSolve').value;
+                let timeToSolve = document.getElementById('timeToSolve').value;
+                timeToSolve*=60;
                 const solveMethod = document.getElementById('solveMethod').value;
 
                 const submissions = localStorage.getItem(`user_submissions_${cfUser}`);

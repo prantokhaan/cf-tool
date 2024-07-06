@@ -69,10 +69,10 @@ $rating = $_GET['rating'];
                 submission.verdict === "OK"
             );
 
-            if(hasSolved){
-                alert('You have already solved this problem.');
-                window.location.href = './allProblems.php';
-            }
+            // if(hasSolved){
+            //     alert('You have already solved this problem.');
+            //     window.location.href = './allProblems.php';
+            // }
 
             let timerInterval;
             let timerRunning = false;
