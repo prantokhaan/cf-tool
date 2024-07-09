@@ -26,6 +26,7 @@
                     <th>Problem Name</th>
                     <th>Time Needed</th>
                     <th>How Solved</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -123,12 +124,13 @@
                 ratingSelect.value = "all";
             });
 
-            var withoutTestCases = [];
+            
+
+            function fetchProblems(rating) {
+                var withoutTestCases = [];
             var withTestCases = [];
             var withEditorial = [];
             var withSolution = [];
-
-            function fetchProblems(rating) {
                 fetch(`fetchSolvedProblems.php?rating=${rating}&username=${username}`)
                     .then(response => {
                         if (!response.ok) {
@@ -195,7 +197,7 @@
                         withSolutionSolved.textContent = withSolution.length;
                         withSolutionPercentage.textContent = (withSolution.length/data.length*100).toFixed(2) + '%';
 
-                        updatePieChart();
+                        updatePieChart(withTestCases, withoutTestCases, withEditorial, withSolution);
                     })
                     .catch(error => {
                         console.error('There was a problem with the fetch operation:', error);
@@ -203,7 +205,7 @@
 
             }
 
-            function updatePieChart() {
+            function updatePieChart(withTestCases, withoutTestCases, withEditorial, withSolution) {
                 const ctx = document.getElementById('statusPieChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'pie',

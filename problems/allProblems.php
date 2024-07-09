@@ -195,6 +195,43 @@
         tableBody.appendChild(row);
     });
 
+    const randButton = document.getElementById('random-problem-btn');
+    const resetRatingButton = document.getElementById('resetRating');
+    const resetContestIdButton = document.getElementById('resetContestId');
+    const resetSearchButton = document.getElementById('resetSearch');
+    const resetFilterTagsButton = document.getElementById('resetFilterTags');
+
+
+    randButton.addEventListener('click', () => {
+        window.location.href = 'randomProblem.php';
+    });
+
+    resetRatingButton.addEventListener('click', () => {
+        document.getElementById('rating').value = '';
+        localStorage.removeItem('ratingFilter');
+        filterProblemsLive();
+    });
+
+    resetContestIdButton.addEventListener('click', () => {
+        document.getElementById('minContestId').value = '';
+        document.getElementById('maxContestId').value = '';
+        localStorage.removeItem('minContestIdFilter');
+        localStorage.removeItem('maxContestIdFilter');
+        filterProblemsLive();
+    });
+
+    resetSearchButton.addEventListener('click', () => {
+        document.getElementById('searchQuery').value = '';
+        localStorage.removeItem('searchQuery');
+        filterProblemsLive();
+    });
+
+    resetFilterTagsButton.addEventListener('click', () => {
+        document.getElementById('filterByTags').value = '';
+        localStorage.removeItem('tagsFilter');
+        filterProblemsLive();
+    });
+
     renderPagination(problems.length, page, perPage);
 }
 
@@ -284,7 +321,6 @@ function renderPagination(totalProblems, currentPage, perPage) {
                 <select id="rating" name="rating">
                     <option value="">All</option>
                 </select>
-                <button type="button" id="filterRating">Filter</button>
                 <button type="button" id="resetRating">Reset Rating</button>
             </div>
             <div class="filter-group">
@@ -292,13 +328,11 @@ function renderPagination(totalProblems, currentPage, perPage) {
                 <input type="number" id="minContestId" name="minContestId">
                 <label for="maxContestId">Max:</label>
                 <input type="number" id="maxContestId" name="maxContestId">
-                <button type="button" id="filterContestId">Filter by Contest ID</button>
                 <button type="button" id="resetContestId">Reset Contest ID</button>
             </div>
             <div class="filter-group">
                 <label for="searchQuery">Search:</label>
                 <input type="text" id="searchQuery" name="searchQuery">
-                <button type="button" id="search">Search</button>
                 <button type="button" id="resetSearch">Reset Search</button>
             </div>
             <div class="filter-group">
@@ -308,7 +342,7 @@ function renderPagination(totalProblems, currentPage, perPage) {
                 </select>
                 <button type="button" id="resetFilterTags">Reset Tags</button>
             </div>
-            <input type="button" class="random-problem-btn" value="Random Problem">
+            <input type="button" class="random-problem-btn" value="Random Problem" id="random-problem-btn">
         </form>
 
         <table>
