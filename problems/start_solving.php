@@ -56,119 +56,121 @@ $rating = $_GET['rating'];
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const contestId = <?php echo json_encode($contestId); ?>;
-            const index = <?php echo json_encode($index); ?>;
-            const cfUser = localStorage.getItem('cfUser');
-            const username = localStorage.getItem('username');
-            document.getElementById('solveForm').username.value = username;
-            const submissions = JSON.parse(localStorage.getItem(`user_submissions_${cfUser}`)) || [];
+    const contestId = <?php echo json_encode($contestId); ?>;
+    const index = <?php echo json_encode($index); ?>;
+    const cfUser = localStorage.getItem('cfUser');
+    const username = localStorage.getItem('username');
+    document.getElementById('solveForm').username.value = username;
+    const submissions = JSON.parse(localStorage.getItem(`user_submissions_${cfUser}`)) || [];
 
-            const hasSolved = submissions.some(submission => 
+    const hasSolved = submissions.some(submission => 
+        submission.problem.contestId == contestId &&
+        submission.problem.index == index &&
+        submission.verdict === "OK"
+    );
+
+    if (hasSolved) {
+        alert('You have already solved this problem.');
+        window.location.href = './allProblems.php';
+    }
+
+    let timerInterval;
+    let timerRunning = false;
+    let timerPaused = false;
+    let seconds = 0;
+    const timerElement = document.querySelector('.timer');
+    const startButton = document.getElementById('startButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const stopButton = document.getElementById('stopButton');
+    const finishedButton = document.getElementById('finishedButton');
+    const solvedOptions = document.querySelector('.solved-options');
+
+    const updateTimerDisplay = () => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        timerElement.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        document.title = "Time: " + timerElement.textContent;
+        document.getElementById('timeToSolve').value = seconds;
+    };
+
+    startButton.addEventListener('click', function() {
+        if (!timerRunning || timerPaused) {
+            clearInterval(timerInterval); // Clear any existing interval before starting a new one
+            if (timerPaused) {
+                timerPaused = false;
+            } else {
+                seconds = 0;
+                window.open(`https://codeforces.com/problemset/problem/${contestId}/${index}`, '_blank');
+            }
+            timerRunning = true;
+            startButton.style.display = 'none';
+            pauseButton.style.display = 'inline-block';
+            stopButton.style.display = 'inline-block';
+            finishedButton.style.display = 'inline-block';
+            timerInterval = setInterval(() => {
+                if (!timerPaused) {
+                    seconds++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+    });
+
+    pauseButton.addEventListener('click', function() {
+        timerPaused = true;
+        startButton.style.display = 'inline-block';
+        pauseButton.style.display = 'none';
+    });
+
+    stopButton.addEventListener('click', function() {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerPaused = false;
+        seconds = 0;
+        updateTimerDisplay();
+        startButton.style.display = 'inline-block';
+        pauseButton.style.display = 'none';
+        stopButton.style.display = 'none';
+        finishedButton.style.display = 'none';
+        document.title = 'Start Solving';
+    });
+
+    finishedButton.addEventListener('click', async function() {
+        timerPaused = true;
+        pauseButton.style.display = 'none';
+        startButton.style.display = 'inline-block';
+        try {
+            const response = await fetch(`https://codeforces.com/api/user.status?handle=${cfUser}&from=1&count=10`);
+            const data = await response.json();
+            const latestSubmission = data.result.find(submission => 
                 submission.problem.contestId == contestId &&
                 submission.problem.index == index &&
                 submission.verdict === "OK"
             );
 
-            // if(hasSolved){
-            //     alert('You have already solved this problem.');
-            //     window.location.href = './allProblems.php';
-            // }
+            if (latestSubmission) {
+                document.getElementById('submissionId').value = latestSubmission.id;
+                document.getElementById('language').value = latestSubmission.programmingLanguage;
+                document.getElementById('problemTags').value = latestSubmission.problem.tags.join(',');
 
-            let timerInterval;
-            let timerRunning = false;
-            let timerPaused = false;
-            let seconds = 0;
-            const timerElement = document.querySelector('.timer');
-            const startButton = document.getElementById('startButton');
-            const pauseButton = document.getElementById('pauseButton');
-            const stopButton = document.getElementById('stopButton');
-            const finishedButton = document.getElementById('finishedButton');
-            const solvedOptions = document.querySelector('.solved-options');
-
-            const updateTimerDisplay = () => {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                timerElement.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                document.title = "Time: " + timerElement.textContent;
-                document.getElementById('timeToSolve').value = seconds;
-            };
-
-            startButton.addEventListener('click', function() {
-                if (!timerRunning || timerPaused) {
-                    if (timerPaused) {
-                        timerPaused = false;
-                    } else {
-                        seconds = 0;
-                        window.open(`https://codeforces.com/problemset/problem/${contestId}/${index}`, '_blank');
-                    }
-                    timerRunning = true;
-                    startButton.style.display = 'none';
-                    pauseButton.style.display = 'inline-block';
-                    stopButton.style.display = 'inline-block';
-                    finishedButton.style.display = 'inline-block';
-                    timerInterval = setInterval(() => {
-                        if (!timerPaused) {
-                            seconds++;
-                            updateTimerDisplay();
-                        }
-                    }, 1000);
-                }
-            });
-
-            pauseButton.addEventListener('click', function() {
-                timerPaused = true;
-                startButton.style.display = 'inline-block';
-                pauseButton.style.display = 'none';
-            });
-
-            stopButton.addEventListener('click', function() {
-                clearInterval(timerInterval);
-                timerRunning = false;
+                solvedOptions.style.display = 'block';
+            } else {
+                alert('Don\'t cheat! You need to solve the problem first.');
                 timerPaused = false;
-                seconds = 0;
-                updateTimerDisplay();
-                startButton.style.display = 'inline-block';
-                pauseButton.style.display = 'none';
-                stopButton.style.display = 'none';
-                finishedButton.style.display = 'none';
-                document.title = 'Start Solving';
-            });
+                pauseButton.style.display = 'inline-block';
+                startButton.style.display = 'none';
+            }
+        } catch (error) {
+            alert('Error fetching submission data. Please try again.');
+            timerPaused = false;
+            pauseButton.style.display = 'inline-block';
+            startButton.style.display = 'none';
+        }
+    });
 
-            finishedButton.addEventListener('click', async function() {
-                timerPaused = true;
-                pauseButton.style.display = 'none';
-                startButton.style.display = 'inline-block';
-                try {
-                    const response = await fetch(`https://codeforces.com/api/user.status?handle=${cfUser}&from=1&count=10`);
-                    const data = await response.json();
-                    const latestSubmission = data.result.find(submission => 
-                        submission.problem.contestId == contestId &&
-                        submission.problem.index == index &&
-                        submission.verdict === "OK"
-                    );
+    updateTimerDisplay();
+});
 
-                    if (latestSubmission) {
-                        document.getElementById('submissionId').value = latestSubmission.id;
-                        document.getElementById('language').value = latestSubmission.programmingLanguage;
-                        document.getElementById('problemTags').value = latestSubmission.problem.tags.join(',');
-
-                        solvedOptions.style.display = 'block';
-                    } else {
-                        alert('Don\'t cheat! You need to solve the problem first.');
-                        timerPaused = false;
-                        pauseButton.style.display = 'inline-block';
-                        startButton.style.display = 'none';
-                    }
-                } catch (error) {
-                    alert('Error fetching submission data. Please try again.');
-                    timerPaused = false;
-                    pauseButton.style.display = 'inline-block';
-                    startButton.style.display = 'none';
-                }
-            });
-
-            updateTimerDisplay();
-        });
     </script>
 </body>
 </html>

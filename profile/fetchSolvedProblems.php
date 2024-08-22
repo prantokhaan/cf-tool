@@ -7,11 +7,11 @@ $username = $_GET['username'];
 
 // Fetch data from the database
 if ($rating == 'all') {
-    $sql = "SELECT id, contestId, problemIndex, problemName, timeToSolve, howSolved FROM solvedProblems WHERE username = ? ORDER BY id DESC";
+    $sql = "SELECT id, contestId, problemIndex, problemName, timeToSolve, howSolved, problemTags FROM solvedProblems WHERE username = ? ORDER BY id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
 } else {
-    $sql = "SELECT id, contestId, problemIndex, problemName, timeToSolve, howSolved FROM solvedProblems WHERE problemRating = ? AND username = ? ORDER BY id DESC";
+    $sql = "SELECT id, contestId, problemIndex, problemName, timeToSolve, howSolved, problemTags FROM solvedProblems WHERE problemRating = ? AND username = ? ORDER BY id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("is", $rating, $username);
 }

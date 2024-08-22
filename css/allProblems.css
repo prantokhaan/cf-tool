@@ -66,14 +66,16 @@ h1 {
 }
 
 .random-problem-btn {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    align-self: flex-end;
-}
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
 
 .random-problem-btn:hover {
     background-color: #218838;
@@ -128,6 +130,26 @@ th {
 .pagination a:hover:not(.active) {
     background-color: #ddd;
 }
+
+#toggleSolvedBtn {
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        #toggleSolvedBtn i {
+            margin-right: 8px;
+        }
+
+        #toggleSolvedBtn:hover {
+            background-color: #45a049;
+        }
 
 /* Responsive Styles */
 @media (max-width: 768px) {

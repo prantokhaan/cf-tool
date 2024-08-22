@@ -28,6 +28,7 @@ if ($row_check['count'] > 0) {
     $name = $_POST['name'];
     $rating = $_POST['rating'];
     $timeToSolve = $_POST['timeToSolve'];
+    $timeToSolve = intval($timeToSolve) / 60;
     $solveMethod = $_POST['solveMethod'];
     $submissionId = $_POST['submissionId'];
     $language = $_POST['language'];

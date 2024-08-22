@@ -12,6 +12,7 @@
     <?php include '../shared/nav.php'; ?>
     <div class="container">
         <h1>Solved Problems</h1>
+        <span class="nextRating" style="display:none"></span>
         <label for="rating">Select Rating:</label>
         <select id="rating">
             <option value="all">All</option>
@@ -78,6 +79,20 @@
          <div id="statusPieChartContainer">
             <canvas id="statusPieChart"></canvas>
         </div>
+        <table id="tagStatusTable">
+            <thead>
+                <tr>
+                    <th>Tag Name</th>
+                    <th>Number of Problems Solved</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+         <div id="statusPieChartContainer">
+            <canvas id="statusTagPieChart"></canvas>
+        </div>
     </div>
 
     <script>
@@ -139,6 +154,7 @@
                         return response.json();
                     })
                     .then(data => {
+                        let tagCounts = {};
                         problemsTableBody.innerHTML = "";
                         data.forEach(problem => {
                             const row = document.createElement('tr');
@@ -161,6 +177,17 @@
                             const howSolvedStat = row.querySelector('#howSolvedStat');
                             howSolvedStat.style.backgroundColor = color;
                             problemsTableBody.appendChild(row);
+                            console.log(problem);
+                            tagCounts = problem.problemTags.split(',').reduce((acc, tag) => {
+                                if (acc[tag]) {
+                                    acc[tag]++;
+                                } else {
+                                    acc[tag] = 1;
+                                }
+                                return acc;
+                            }, tagCounts);
+                            updateTagTable(tagCounts);
+                            updateTagPieChart(tagCounts);
                         });
                         totalTried.textContent = data.length;
                         var solvedCount = 0;
@@ -197,6 +224,20 @@
                         withSolutionSolved.textContent = withSolution.length;
                         withSolutionPercentage.textContent = (withSolution.length/data.length*100).toFixed(2) + '%';
 
+                        var succRate = parseFloat(successRate.textContent);
+
+                        if(solvedCount>=40 && succRate>=80){
+                            console.log(succRate);
+                            document.querySelector('.nextRating').style.display = "block";
+                            var text = "You can now move to the Rating: " + (parseInt(rating)+100);
+                            document.querySelector('.nextRating').textContent = text;
+                        }
+
+                        
+
+
+                        // updateTagPieChart(tagCounts);
+
                         updatePieChart(withTestCases, withoutTestCases, withEditorial, withSolution);
                     })
                     .catch(error => {
@@ -205,38 +246,94 @@
 
             }
 
-            function updatePieChart(withTestCases, withoutTestCases, withEditorial, withSolution) {
-                const ctx = document.getElementById('statusPieChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['With Test Cases', 'Without Test Cases', 'With Editorial', 'With Solution'],
-                        datasets: [{
-                            data: [
-                                withTestCases.length,
-                                withoutTestCases.length,
-                                withEditorial.length,
-                                withSolution.length
-                            ],
-                            backgroundColor: [
-                                '#41B06E',
-                                '#8DECB4',
-                                '#DD5746',
-                                '#FFB74D'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                        }
-                    }
-                });
+            let tagPieChart; // Declare a global variable for the tag pie chart
+let statusPieChart; // Declare a global variable for the status pie chart
+
+function updateTagPieChart(tagCounts) {
+    const ctx = document.getElementById('statusTagPieChart').getContext('2d');
+    const tagLabels = Object.keys(tagCounts);
+    const tagData = Object.values(tagCounts);
+
+    // Destroy the existing chart if it exists
+    if (tagPieChart) {
+        tagPieChart.destroy();
+    }
+
+    // Create a new chart
+    tagPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: tagLabels,
+            datasets: [{
+                data: tagData,
+                backgroundColor: tagLabels.map(() => '#' + Math.floor(Math.random() * 16777215).toString(16)),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
             }
+        }
+    });
+}
+
+function updateTagTable(tagCounts) {
+    const tagTableBody = document.querySelector('#tagStatusTable tbody');
+    tagTableBody.innerHTML = "";
+    Object.entries(tagCounts).forEach(([tagName, count]) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${tagName}</td>
+            <td>${count}</td>
+        `;
+        tagTableBody.appendChild(row);
+    });
+}
+
+function updatePieChart(withTestCases, withoutTestCases, withEditorial, withSolution) {
+    const ctx = document.getElementById('statusPieChart').getContext('2d');
+
+    // Destroy the existing chart if it exists
+    if (statusPieChart) {
+        statusPieChart.destroy();
+    }
+
+    // Create a new chart
+    statusPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['With Test Cases', 'Without Test Cases', 'With Editorial', 'With Solution'],
+            datasets: [{
+                data: [
+                    withTestCases.length,
+                    withoutTestCases.length,
+                    withEditorial.length,
+                    withSolution.length
+                ],
+                backgroundColor: [
+                    '#41B06E',
+                    '#8DECB4',
+                    '#DD5746',
+                    '#FFB74D'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            }
+        }
+    });
+}
+
         });
     </script>
 </body>

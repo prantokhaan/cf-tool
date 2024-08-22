@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="../css/allProblems.css">
     <link rel="stylesheet" href="../shared/loader.css">
     <link rel="favicon" href="../images/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script>
         let allProblems = [];
+        let showSolved = JSON.parse(localStorage.getItem('showSolved')) || false;
 
         async function fetchProblemsFromApi() {
             document.body.classList.add('loading');
@@ -173,6 +175,12 @@
     const paginatedProblems = problems.slice(start, end);
 
     paginatedProblems.forEach(problem => {
+        const isSolved = userSubmissions && userSubmissions.some(submission =>
+                    submission.problem.contestId === problem.contestId &&
+                    submission.problem.index === problem.index &&
+                    submission.verdict === 'OK'
+                );
+                if (isSolved && !showSolved) return;
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${problem.contestId}${problem.index}</td>
@@ -308,6 +316,24 @@ function renderPagination(totalProblems, currentPage, perPage) {
     });
 }
 
+function toggleShowSolved() {
+            showSolved = !showSolved;
+            localStorage.setItem('showSolved', showSolved);
+            updateToggleButton();
+            filterProblemsLive();
+        }
+
+        function updateToggleButton() {
+            document.getElementById('toggleSolvedBtn').innerHTML = showSolved ? 
+                '<i class="fas fa-eye-slash"></i> Hide Solved Problems' : 
+                '<i class="fas fa-eye"></i> Show Solved Problems';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateToggleButton();
+            console.log("updated");
+        });
+
     </script>
 </head>
 <body>
@@ -343,6 +369,11 @@ function renderPagination(totalProblems, currentPage, perPage) {
                 <button type="button" id="resetFilterTags">Reset Tags</button>
             </div>
             <input type="button" class="random-problem-btn" value="Random Problem" id="random-problem-btn">
+            
+            <button id="toggleSolvedBtn" onclick="toggleShowSolved()">
+            <i class="fas fa-eye"></i> Show Solved Problems
+        </button>
+
         </form>
 
         <table>
@@ -373,6 +404,8 @@ function renderPagination(totalProblems, currentPage, perPage) {
             option.textContent = i;
             selectRating.appendChild(option);
         }
+
+
     </script>
 </body>
 </html>
